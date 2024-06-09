@@ -1,0 +1,127 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+class Course {
+    String code;
+    String title;
+    String description;
+    int capacity;
+    int schedule;
+    int availableSlots;
+
+    public Course(String code, String title, String description, int capacity, int schedule) {
+        this.code = code;
+        this.title = title;
+        this.description = description;
+        this.capacity = capacity;
+        this.schedule = schedule;
+        this.availableSlots = capacity;
+    }
+}
+
+class Student {
+    String id;
+    String name;
+    ArrayList<Course> registeredCourses;
+
+    public Student(String id, String name) {
+        this.id = id;
+        this.name = name;
+        this.registeredCourses = new ArrayList<>();
+    }
+}
+
+public class CourseDatabase {
+    Map<String, Course> courses;
+    Map<String, Student> students;
+
+    public CourseDatabase() {
+        this.courses = new HashMap<>();
+        this.students = new HashMap<>();
+    }
+
+    public void addCourse(String code, String title, String description, int capacity, int schedule) {
+        Course course = new Course(code, title, description, capacity, schedule);
+        courses.put(code, course);
+    }
+
+    public void addStudent(String id, String name) {
+        Student student = new Student(id, name);
+        students.put(id, student);
+    }
+
+    public void displayCourses() {
+        for (Course course : courses.values()) {
+            System.out.println("Code: " + course.code + ", Title: " + course.title + ", Description: " + course.description + ", Capacity: " + course.capacity + ", Schedule: " + course.schedule + ", Available Slots: " + course.availableSlots);
+        }
+    }
+
+    public void registerCourse(String studentId, String courseId) {
+        Student student = students.get(studentId);
+        Course course = courses.get(courseId);
+        if (course.availableSlots > 0) {
+            student.registeredCourses.add(course);
+            course.availableSlots--;
+            System.out.println("Course registered successfully.");
+        } else {
+            System.out.println("Course is full. Registration failed.");
+        }
+    }
+
+    public void dropCourse(String studentId, String courseId) {
+        Student student = students.get(studentId);
+        Course course = courses.get(courseId);
+        if (student.registeredCourses.contains(course)) {
+            student.registeredCourses.remove(course);
+            course.availableSlots++;
+            System.out.println("Course dropped successfully.");
+        } else {
+            System.out.println("You are not registered for this course. Drop failed.");
+        }
+    }
+
+    public static void main(String[] args) {
+        CourseDatabase db = new CourseDatabase();
+        Scanner scanner = new Scanner(System.in);
+
+        db.addCourse("CS101", "Introduction to Computer Science", "Introduction to computer science concepts", 30, 2);
+        db.addCourse("CS202", "Data Structures", "Introduction to data structures", 25, 3);
+        db.addStudent("S101", "John Doe");
+        db.addStudent("S102", "Jane Doe");
+
+        while (true) {
+            System.out.println("1. Display Courses");
+            System.out.println("2. Register Course");
+            System.out.println("3. Drop Course");
+            System.out.println("4. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            switch (choice) {
+                case 1:
+                    db.displayCourses();
+                    break;
+                case 2:
+                    System.out.print("Enter student ID: ");
+                    String studentId = scanner.next();
+                    System.out.print("Enter course ID: ");
+                    String courseId = scanner.next();
+                    db.registerCourse(studentId, courseId);
+                    break;
+                case 3:
+                    System.out.print("Enter student ID: ");
+                    studentId = scanner.next();
+                    System.out.print("Enter course ID: ");
+                    courseId = scanner.next();
+                    db.dropCourse(studentId, courseId);
+                    break;
+                case 4:
+                    System.out.println("Goodbye!");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
